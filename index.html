@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Landing Page Template</title>
+    <meta name="description" content="A customizable artist/band landing page template with multilingual support and background video.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background-color: #000;
+            font-size: 15px;
+        }
+
+        .video-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        #youtubeBackground {
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+        }
+        #youtubeBackground iframe {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .video-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: -1;
+        }
+
+        .sound-toggle, .language-toggle {
+            position: fixed;
+            top: 15px;
+            background: rgba(198,40,40,0.8);
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-toggle {
+            right: 15px;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            font-size: 1rem;
+        }
+        .language-toggle {
+            left: 15px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+        .sound-toggle:hover { background: #c62828; transform: scale(1.1); }
+        .language-toggle:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header { text-align: center; padding: 1.5rem 0; }
+        .logo-container { display: flex; justify-content: center; margin-bottom: 1rem; }
+        .band-logo {
+            max-width: 350px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 10px rgba(0,0,0,0.8));
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.4);
+            background-color: rgba(255,255,255,0.2);
+            padding: 10px;
+        }
+        .tagline {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            text-align: center;
+            margin: 0 auto 2rem;
+            line-height: 1.4;
+            max-width: 700px;
+            padding: 0 1rem;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .content-section {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 60px; height: 3px;
+            background: #c62828;
+            bottom: -8px; left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .band-members {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+        }
+        .member-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 140px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .member-photo-container {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .member-photo-container:hover {
+            border-color: #c62828;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(198,40,40,0.3);
+        }
+        .member-photo { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .member-icon { font-size: 2.5rem; color: rgba(255,255,255,0.3); }
+        .member-name {
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 0.5rem;
+            min-height: 2.5rem;
+            line-height: 1.3;
+        }
+
+        .cta-section { text-align: center; padding: 1.5rem 0; }
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.2rem;
+        }
+        .cta-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .cta-btn.primary {
+            background: #c62828;
+            color: white;
+            box-shadow: 0 4px 15px rgba(198,40,40,0.3);
+        }
+        .cta-btn.primary:hover {
+            background: #d32f2f;
+            transform: translateY(-3px);
+        }
+        .cta-btn.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        .cta-btn.secondary:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .follow-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .social-icon {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover { background: #c62828; transform: translateY(-5px); }
+        .copyright { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 1.2rem; }
+
+        .play-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .play-overlay.active { opacity: 1; pointer-events: all; }
+        .play-button {
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px; height: 70px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .play-button:hover { background: #d32f2f; transform: scale(1.1); }
+
+        @media (max-width: 768px) {
+            .band-logo { max-width: 250px; }
+            .tagline { font-size: 1.2rem; }
+            .section-title { font-size: 1.4rem; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .cta-btn { min-width: 220px; width: 100%; max-width: 280px; }
+            .member-photo-container { width: 100px; height: 100px; }
+            .member-card { width: 120px; }
+        }
+        @media (max-width: 480px) {
+            .band-logo { max-width: 200px; }
+            .tagline { font-size: 1.1rem; }
+            .member-photo-container { width: 90px; height: 90px; }
+            .member-card { width: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="play-overlay" id="playOverlay">
+        <button class="play-button" id="playButton"><i class="fas fa-play"></i></button>
+        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+            <span data-lang="es">Haz clic para comenzar</span>
+            <span data-lang="en">Click to start the experience</span>
+            <span data-lang="ja">クリックして開始</span>
+        </p>
+        <p style="font-size: 0.85rem; color: #ccc; max-width: 350px;">
+            <span data-lang="es">El navegador requiere interacción para reproducir audio</span>
+            <span data-lang="en">Browser requires user interaction to play audio</span>
+            <span data-lang="ja">ブラウザはオーディオ再生にユーザー操作が必要です</span>
+        </p>
+    </div>
+
+    <button class="language-toggle" id="languageToggle">
+        <i class="fas fa-language"></i>
+        <span id="langToggleLabel">Español</span>
+    </button>
+
+    <button class="sound-toggle" id="soundToggle" title="Toggle sound">
+        <i class="fas fa-volume-mute"></i>
+    </button>
+
+    <div class="video-container"><div id="youtubeBackground"></div></div>
+    <div class="video-overlay"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="Logo" class="band-logo" id="bandLogo">
+            </div>
+            <div class="tagline" id="tagline"></div>
+        </header>
+
+        <main>
+            <section class="content-section">
+                <h2 class="section-title">
+                    <span data-lang="es">Conócenos</span>
+                    <span data-lang="en">Meet the Team</span>
+                    <span data-lang="ja">メンバー紹介</span>
+                </h2>
+                <div class="band-members" id="bandMembers"></div>
+            </section>
+
+            <section class="cta-section">
+                <h2 class="section-title">
+                    <span data-lang="es">Conéctate</span>
+                    <span data-lang="en">Connect With Us</span>
+                    <span data-lang="ja">お問い合わせ</span>
+                </h2>
+                <div class="cta-buttons">
+                    <a href="listen.html" class="cta-btn primary">
+                        <i class="fas fa-play-circle"></i>
+                        <span data-lang="es">Escuchar Ahora</span>
+                        <span data-lang="en">Listen Now</span>
+                        <span data-lang="ja">今すぐ聴く</span>
+                    </a>
+                    <a href="#" class="cta-btn secondary" id="showsBtn">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span data-lang="es">Próximos Eventos</span>
+                        <span data-lang="en">Upcoming Shows</span>
+                        <span data-lang="ja">今後の予定</span>
+                    </a>
+                    <a href="#" class="cta-btn secondary" id="contactBtn">
+                        <i class="fas fa-envelope"></i>
+                        <span data-lang="es">Contáctanos</span>
+                        <span data-lang="en">Contact Us</span>
+                        <span data-lang="ja">お問い合わせ</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="follow-text">
+                <span data-lang="es">Síguenos</span>
+                <span data-lang="en">Follow Us</span>
+                <span data-lang="ja">フォローする</span>
+            </div>
+            <div class="social-links" id="socialLinks"></div>
+            <div class="copyright" id="copyrightText"></div>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        let isMuted = true;
+        let autoplaySuccessful = false;
+        let currentLang = SITE_CONFIG.defaultLanguage;
+
+        const SOCIAL_ICONS = {
+            spotify:   { icon: 'fa-spotify',     label: 'Spotify' },
+            youtube:   { icon: 'fa-youtube',     label: 'YouTube' },
+            instagram: { icon: 'fa-instagram',   label: 'Instagram' },
+            facebook:  { icon: 'fa-facebook-f',  label: 'Facebook' },
+            tiktok:    { icon: 'fa-tiktok',      label: 'TikTok' },
+            bandcamp:  { icon: 'fa-bandcamp',    label: 'Bandcamp' }
+        };
+
+        const LANG_LABELS = { es: 'Español', en: 'English', ja: '日本語' };
+        const LANG_CYCLE = { es: 'en', en: 'ja', ja: 'es' };
+
+        // ---------- Language ----------
+        function applyLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                el.style.display = el.dataset.lang === lang ? '' : 'none';
+            });
+            const taglineEl = document.getElementById('tagline');
+            if (taglineEl && SITE_CONFIG.tagline[lang]) {
+                taglineEl.textContent = SITE_CONFIG.tagline[lang];
+            }
+            document.getElementById('langToggleLabel').textContent = LANG_LABELS[LANG_CYCLE[lang]];
+            document.documentElement.lang = lang;
+            renderMembers();
+            renderCopyright();
+        }
+
+        // ---------- Members ----------
+        function renderMembers() {
+            const container = document.getElementById('bandMembers');
+            container.innerHTML = '';
+            SITE_CONFIG.members.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                card.innerHTML = `
+                    <div class="member-photo-container">
+                        <div class="member-icon"><i class="fas fa-user"></i></div>
+                        ${m.photo ? `<img src="assets/band-photos/${m.photo}" alt="${m.names[currentLang]}" class="member-photo">` : ''}
+                    </div>
+                    <div class="member-name">${m.names[currentLang] || ''}</div>
+                `;
+                // Handle photo loading
+                const img = card.querySelector('.member-photo');
+                if (img) {
+                    img.onload = () => {
+                        img.style.display = 'block';
+                        card.querySelector('.member-icon').style.display = 'none';
+                    };
+                    img.onerror = () => {
+                        img.style.display = 'none';
+                    };
+                }
+                card.addEventListener('click', () => {
+                    alert(`${m.names[currentLang]}\n\n${
+                        currentLang === 'es' ? 'Haz clic en "Escuchar Ahora" para conocer más.' :
+                        currentLang === 'ja' ? '「今すぐ聴く」をクリックして詳細をご覧ください。' :
+                        'Click "Listen Now" to learn more.'
+                    }`);
+                });
+                container.appendChild(card);
+            });
+        }
+
+        // ---------- Social ----------
+        function renderSocial() {
+            const container = document.getElementById('socialLinks');
+            container.innerHTML = '';
+            Object.entries(SITE_CONFIG.social).forEach(([key, url]) => {
+                if (!url || !SOCIAL_ICONS[key]) return;
+                const a = document.createElement('a');
+                a.href = url;
+                a.className = 'social-icon';
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.setAttribute('aria-label', SOCIAL_ICONS[key].label);
+                a.innerHTML = `<i class="fab ${SOCIAL_ICONS[key].icon}"></i>`;
+                container.appendChild(a);
+            });
+        }
+
+        // ---------- Copyright ----------
+        function renderCopyright() {
+            const el = document.getElementById('copyrightText');
+            const year = SITE_CONFIG.copyrightYear;
+            const name = SITE_CONFIG.footerName;
+            const texts = {
+                es: `© ${year} ${name}. Todos los derechos reservados.`,
+                en: `© ${year} ${name}. All rights reserved.`,
+                ja: `© ${year} ${name}. 無断複写・転載を禁じます。`
+            };
+            el.textContent = texts[currentLang];
+        }
+
+        // ---------- CTA Buttons ----------
+        function setupCTA() {
+            document.getElementById('contactBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (SITE_CONFIG.contactEmail) {
+                    window.location.href = `mailto:${SITE_CONFIG.contactEmail}`;
+                } else {
+                    alert('Contact info coming soon.');
+                }
+            });
+            document.getElementById('showsBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (SITE_CONFIG.showsUrl) {
+                    window.location.href = SITE_CONFIG.showsUrl;
+                } else {
+                    const msg = {
+                        es: 'Próximamente. ¡Síguenos en redes!',
+                        en: 'Coming soon. Follow us on social media!',
+                        ja: '近日公開予定。SNSをフォローしてください！'
+                    };
+                    alert(msg[currentLang]);
+                }
+            });
+        }
+
+        // ---------- YouTube ----------
+        function onYouTubeIframeAPIReady() {
+            if (!SITE_CONFIG.backgroundVideoId) {
+                // No video — apply a solid gradient instead
+                document.querySelector('.video-container').style.background =
+                    'linear-gradient(135deg, #1a1a1a 0%, #000 100%)';
+                return;
+            }
+            player = new YT.Player('youtubeBackground', {
+                videoId: SITE_CONFIG.backgroundVideoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'mute': 0,
+                    'loop': 1,
+                    'playlist': SITE_CONFIG.backgroundVideoId,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'playsinline': 1,
+                    'start': SITE_CONFIG.backgroundStartTime
+                },
+                events: {
+                    'onReady': (e) => {
+                        e.target.seekTo(SITE_CONFIG.backgroundStartTime, true);
+                        e.target.playVideo();
+                        isMuted = false;
+                        updateSoundButton();
+                        setTimeout(() => {
+                            if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                                document.getElementById('playOverlay').classList.add('active');
+                            }
+                        }, 1500);
+                    },
+                    'onStateChange': (e) => {
+                        if (e.data === YT.PlayerState.PLAYING && !autoplaySuccessful) {
+                            autoplaySuccessful = true;
+                            document.getElementById('playOverlay').classList.remove('active');
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSoundButton() {
+            document.getElementById('soundToggle').innerHTML =
+                isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+        }
+
+        function startVideo() {
+            if (player) {
+                document.getElementById('playOverlay').classList.remove('active');
+                player.seekTo(SITE_CONFIG.backgroundStartTime, true);
+                player.playVideo();
+                try { player.unMute(); player.setVolume(100); isMuted = false; updateSoundButton(); } catch(e) {}
+            } else {
+                document.getElementById('playOverlay').classList.remove('active');
+            }
+        }
+
+        // ---------- Init ----------
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('bandLogo').src = SITE_CONFIG.logoPath;
+            document.title = SITE_CONFIG.siteName;
+
+            renderSocial();
+            setupCTA();
+            applyLanguage(currentLang);
+
+            document.getElementById('languageToggle').addEventListener('click', () => {
+                applyLanguage(LANG_CYCLE[currentLang]);
+            });
+
+            document.getElementById('soundToggle').addEventListener('click', () => {
+                if (!player) return;
+                if (isMuted) { player.unMute(); isMuted = false; }
+                else { player.mute(); isMuted = true; }
+                updateSoundButton();
+            });
+
+            document.getElementById('playButton').addEventListener('click', startVideo);
+            document.getElementById('playOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'playOverlay') startVideo();
+            });
+        });
+    </script>
+</body>
+</html>
